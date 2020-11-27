@@ -77,12 +77,12 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#9a1334', end
     border: 1px solid white;
     border-radius: 50px;
     margin-left: -50px;
-    width: 80px;
+    width: 95px;
     transition: .7s;
    
 }
 .text-input-btn:hover{
-    width: 100px;
+    width: 110px;
     margin-left: -60px
 }
 .text-input:focus, .text-input-btn:focus{
