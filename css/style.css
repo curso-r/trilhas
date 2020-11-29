@@ -118,7 +118,7 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#9a1334', end
     border-radius: 20px;
     border: none;
     margin-top: 20px;
-    margin-left: 10px;
+    margin-left: 10%;
     transition: .7s
 }
 .insc-btn:hover{

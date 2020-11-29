@@ -1,0 +1,622 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8"/>
+        <meta name="viewport" content="initial-scale=1.0,user-scalable=no,maximum-scale=1,width=device-width" />
+        <title>Trilha Machine Learning | Curso-R</title>
+    <link rel="shortcut icon" type="image/png" href="images/favicon.png"/>
+    <link href="css/bootstrap.min.css" rel="stylesheet" type="text/css">
+    <link href="css/style.css" rel="stylesheet" type="text/css">
+    <link href="https://fonts.googleapis.com/css?family=Montserrat:300,500,700,900&display=swap" rel="stylesheet">
+    <script src="https://assets.pagar.me/checkout/1.1.0/checkout.js"></script>
+  <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+  <script src ="https://assets.pagar.me/checkout/1.1.0//easyXDM.js"></script>
+</head>
+    <body>
+        <div class="reg-all">
+        <!--home-->
+        <div class="row home-info-row">
+            <div class="bg-gradient"></div>     
+            
+            <div class="container">
+                <div class="col-xs-12 col-sm-12 col-md-8 col-lg-7">
+                    <div class="local-btn">Curso Online</div>
+                    <h1>Machine Learning</h1>
+                    <h2>Trilha de Formação em Data Science</h2>
+                    <p class="description"> Cientistas de dados são profissionais responsáveis por analisar, descrever e modelar grandes massas de dados e <b>a habilidade de construir bons modelos preditivos é um dos pré-requisitos mais solicitados pelo mercado hoje em dia</b>. Nessa trilha, você vai aprender, o que são, quando utilizar e como ajustar modelos de Machine Learning utilizando o R. Além da prática, também discutiremos o que cada um dos principais algoritmos faz por trás das cortinas e como interpretar seus resultados.</p>
+                    <div class="date-cont"><img src="images/calendario.svg" alt="data do curso" /><span>13 de março à 29 de julho, com aulas às segundas, quintas e sábados</span> <br> 
+                      <span style = "margin-left: 4%; font-size: 9pt;"> As aulas são ao vivo. Você terá contato direto com as(os) prefessoras(es)!</span><br>
+                      <span style = "margin-left: 4%; font-size: 9pt;">Confira abaixo o calendário de aulas de cada curso.</span>
+                    </div>
+                    <div class="time-cont">
+                      <img src="images/relogio.svg" alt="tempo de curso" /> <span>  20 aulas, 60 horas de curso</span>
+                    </div>
+                    
+                    <form class="desc-info">
+                    <input class="text-input" name="desconto" id="desconto" type="text" placeholder="cupom de desconto" maxlength="16"/>
+                    <button  id = "enviar-cupom" class="text-input-btn" type="button">Aplicar</button>
+                    </form>
+                        <div class="row price-row">
+                            <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3 price">
+                                <h3>de <span class="old-price">R$2200</span> por:</h3>
+                                <h2 id="valor">R$2090</h2>
+                            </div>
+                            <div class="col-xs-12 col-sm-12 col-md-9 col-lg-9">
+                                <button id = "pagamento" class="btn-insc insc-btn" />inscreva-se</button>
+                            <script>
+          
+            var dados = {
+                amount: '209000',
+                buttonText: 'Pagar',
+                buttonClass: 'btn-insc',
+                customerData: 'true',
+                createToken: 'true',
+                paymentMethods: 'credit_card, boleto',
+                maxInstallments: 12,
+                interestRate: 0.70,
+                items: [
+                  {
+                    id: '49',
+                    title: 'Machine Learning',
+                    unit_price: '209000',
+                    quantity: 1,
+                    tangible: true
+                  }
+                ],
+                postbackUrl: 'https://pagarme-checkout.curso-r.com/postback',
+                capture: 'true'
+              }
+          
+          
+            var button = document.querySelector('#pagamento');
+
+            // Abrir o modal ao clicar no botão
+            button.addEventListener('click', function() {
+        
+              // inicia a instância do checkout
+              var checkout = new PagarMeCheckout.Checkout({
+                encryption_key: 'ek_live_RALOFQpSyLk9NhCBgZa7JrHSyz3hpp',   
+                success: function(data) {
+                  console.log(data);
+                  axios.get('https://pagarme-checkout.curso-r.com/captura?token=' + data.token + '&cupom=' + document.querySelector('#desconto').value)
+                        .then(function (response) {
+                          // handle success
+                          console.log(response);
+                          if (response.data.payment_method == "boleto") {
+                            url = response.data.boleto_url[0];
+                            window.location.href = url; 
+                          };
+                        })
+                        .catch(function (error) {
+                          // handle error
+                          console.log(error);
+                        })
+                },
+                error: function(err) {
+                	console.log(err);
+                },
+                close: function() {
+                	console.log('The modal has been closed.');
+                }
+              });
+              
+              checkout.open(dados);
+              
+            })
+            
+            var desconto = document.querySelector('#enviar-cupom');
+            
+            desconto.addEventListener('click', function() {
+              
+              var cupom  = document.querySelector('#desconto').value
+              
+              axios.get('https://pagarme-checkout.curso-r.com/cupom?id=' + dados.items[0].id + '&cupom=' + cupom)
+                        .then(function (response) {
+                          
+                          // manter essa linha p/ mduar o preço do pagarme
+                          dados.amount = response.data.amount
+                        
+                          $('#pagamento').text("Inscreva-se com desconto");
+                          
+                          /* botao de enviar cupom */
+                          let botaoEnviarCupom = $('#enviar-cupom');
+                          botaoEnviarCupom.text("Aplicado!");
+                          botaoEnviarCupom.addClass('cupom-success');
+                          botaoEnviarCupom.removeClass('cupom-failure');
+                          
+                          /* texto do preco */
+                          let amount = (response.data.amount/100).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL', minimumFractionDigits: 0 });
+                          $("#valor").text(amount);
+                        })
+                        .catch(function (error) {
+                          
+                          /* botao de enviar cupom */
+                          let botaoEnviarCupom = $('#enviar-cupom');
+                          botaoEnviarCupom.text("Inválido");
+                          botaoEnviarCupom.removeClass('cupom-success');
+                          botaoEnviarCupom.addClass('cupom-failure');
+                          
+                          /* texto do preco */
+                          $("#valor span:first").removeClass("preco-antigo");
+                          $("#valor span:last").text("");
+                        })
+              
+            })
+              
+          </script>
+                            </div>
+                        </div>                    
+                    <p class="disclaimer">Ao se inscrever no curso, você declara estar de acordo com os nossos <a class="terms" href="#" target="_blank">Termos de uso.</a></p>
+                </div>
+            </div>
+        </div>
+           <!--nav-bar-->
+            <div class="row nav-cont-row sticker sticker-mob">
+                <div class="container">
+                    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 nav-cont">
+                        <ul>
+                            <li class="nav-item i-sobre nav-item-active"><a href="#sobre">Sobre</a></li>
+                            <li class="nav-item i-curso"><a href="#cursos">Cursos</a></li>
+                            <li class="nav-item i-como"><a href="#sobre-curso">Sobre o curso</a></li>
+                            <li class="nav-item i-inst"><a href="#professores">Instrutores</a></li>
+                            <li class="nav-item i-faq"><a href="#faq">FAQ</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <!--FIRST SEC-->
+          <div class="row one-row "id="sobre">
+            <div class="container">
+                <div class="col-xs-12 col-sm-12 col-md-7 col-lg-8">
+                    <h1 class="title-r"><span>Habilidades adquiridas no curso</span></h1>
+                    <div class="item-skill">
+                        <div>Organização de projetos de modelagem</div>
+                        <div>Métricas e funções de custo</div>
+                        <div>Overfitting</div>
+                        <div>Bases de treino/teste/validação</div>
+                        <div>Validação cruzada</div>
+                        <div>Curva ROC</div>
+                        <div>Regressão linear</div>
+                        <div>Regressão logística</div>
+                        <div>Árvores de decisão</div>
+                        <div>Random forest</div>
+                        <div>XGBoost</div>
+                        <div>Deep learning</div>
+                    </div>
+                    <h1 class="title-r"><span>Programa do curso</span></h1>
+                    <p> O programa do curso é separado em 4 blocos, encapsulando os conteúdos em jornadas que amplificam a construção do conhecimento. Os cursos de Machine Learning e Deep Learning acontecerão às segundas e quintas, das 19h00 às 22h00. Os cursos de Regressão Linear e XGBoost acontecerão aos sábados, das 9h00 às 12h00. <b>Não haverá aula em feriados e emendas de feriados.</b></p>
+               
+                </div>
+                <div class="col-xs-12 col-sm-12 col-md-5 col-lg-4">
+                    <div class="box-r">
+                               <h1 class="red bold text-center">O que vou receber?</h1>
+                            <div class="row box-r-cont">
+                                <div class="col-xs-3 col-sm-3 col-md-3 col-lg-3"><img src="images/selo.svg" /></div>
+                                <div class="col-xs-9 col-sm-9 col-md-9 col-lg-9">
+                                    <h4 class="bold">Certificados dos cursos</h4>
+                                    <p>Entrega digital após conclusão</p>
+                                </div>
+                            </div>
+                        <div class="row box-r-cont">
+                                <div class="col-xs-3 col-sm-3 col-md-3 col-lg-3"><img src="images/web.svg" /></div>
+                                <div class="col-xs-9 col-sm-9 col-md-9 col-lg-9">
+                                    <h4 class="bold">Cursos 100% on-line</h4>
+                                    <p>As aulas são ao vivo, mas ficam gravadas e a disposição por 1 ano</p>
+                                </div>
+                            </div>
+                        <div class="row box-r-cont">
+                                <div class="col-xs-3 col-sm-3 col-md-3 col-lg-3"><img src="images/lingua.svg" /></div>
+                                <div class="col-xs-9 col-sm-9 col-md-9 col-lg-9">
+                                    <h4 class="bold">Português</h4>
+                                    
+                                </div>
+                            </div>
+                        <div class="row box-r-cont">
+                                <div class="col-xs-3 col-sm-3 col-md-3 col-lg-3"><img src="images/nivel.svg" /></div>
+                                <div class="col-xs-9 col-sm-9 col-md-9 col-lg-9">
+                                    <h4 class="bold">Nível básico</h4>
+                                    <p>Não exige <a class="red" href="#sobre-curso">experiência prévia.</a></p>
+                                </div>
+                            </div>
+                    </div>
+                </div>
+                
+              </div>
+            </div>
+            <!--CURSOS-->
+            <div class="row cursos-row">
+                <div class="container">
+                    
+                    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 curso-all" id="cursos">
+                        <h1 class="text-center title-r"><span>Cursos do programa</span></h1>
+                        <p style = "text-align: center;">Clique no nome de cada curso para acessar suas páginas individuais.</p>
+                        <!--CURSO 1-->
+                        <div class="row curso-item">
+                            <div class="col-xs-12 col-sm-2 col-md-2 col-lg-2 curso-number">
+                                <h4>curso</h4>
+                                <h1>1</h1>
+                            </div>
+                            <div class="col-xs-12 col-sm-10 col-md-10 col-lg-10 curso-box">
+                                <a href = "https://www.curso-r.com/cursos/regressao-linear/" target = "_blank"><h1 class="title-r">REGRESSÃO LINEAR</h1></a>
+                                 <div class="date-cont"><img src="images/calendario.svg" alt="data do curso" /><span> 13, 20 e 27 de março, três sábados, das 9h00 às 12h00</span></div>
+                    <div class="time-cont"><img src="images/relogio.svg" alt="tempo de curso" /><span>3 aulas, 9 horas de curso</span></div>
+                                <p>A regressão linear é historicamente a técnica mais discutida e utilizada na Estatística. Graças à sua facilidade de implementação e interpretação e por se ajustar bem a diversos problemas reais, ela é aplicada para modelagem de dados e testes de hipóteses nas mais diversas áreas do conhecimento.
+                                </p>
+                                <p>O objetivo deste workshop é apresentar os principais conceitos por trás da regressão linear, discutindo quando é razoável aplicar essa técnica e como ajustá-la utilizando o R. Também vamos abordar interpretação de  parâmetros, testes de hipóteses e técnicas para avaliar se nossos modelos estão bem ajustados.</p>
+                                <button class="btn-drop"data-toggle="collapse"  data-target="#curso-a"><h2>Conteúdo</h2><span>+</span>
+                                  </button>
+                                <div class="red-bar"></div>
+                                <div class="cont-cursos collapse multi-collapse" id="curso-a">
+                                      
+                                    <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4">
+                                        <h2>Introdução</h2>
+                                        <ul>
+                                        <li> O que é e quando usar regressão linear</li>
+                                        <li>O que são parâmetros e como interpretá-los</li>
+                                        </ul>
+                                    </div>
+                                    <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4">
+                                        <h2>Ajuste</h2>
+                                        <ul>
+                                        <li>Implementação de modelos de regressão linear no R</li>
+                                        <li>Transformações nas variáveis</li>
+                                        <li>Interações de variáveis</li>
+                                        </ul>
+                                    </div>
+                                    <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4">
+                                        <h2>Testando hipóteses</h2>
+                                        <ul>
+                                          <li>Construindo intervalos de confiança</li>
+                                          <li>Construindo testes de hipóteses</li>
+                                          <li>O valor p</li>
+                                        </ul>
+                                    </div>
+                                    <div class="row"></div>
+                                    <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4">
+                                        <h2>Diagnóstico</h2>
+                                        <ul>
+                                          <li>Avaliando as suposições do modelo</li>
+                                          <li>Avaliando <em>outliers</em></li>
+                                          <li>Avaliando a qualidade do ajuste</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                         <!--CURSO 2-->
+                        <div class="row curso-item">
+                            <div class="col-xs-12 col-sm-2 col-md-2 col-lg-2 curso-number">
+                                <h4>curso</h4>
+                                <h1>2</h1>
+                            </div>
+                            <div class="col-xs-12 col-sm-10 col-md-10 col-lg-10 curso-box">
+                                <a href = "https://www.curso-r.com/cursos/intro-machine-learning/" target = "_blank"><h1 class="title-r">INTRODUÇÃO AO MACHINE LEARNING</h1></a>
+                                 <div class="date-cont"><img src="images/calendario.svg" alt="data do curso" /><span> 26 de abril a 20 de maio, às segundas e quintas, das 19h00 às 22h00</span></div>
+                                 
+                    <div class="time-cont"><img src="images/relogio.svg" alt="tempo de curso" /><span>  8 aulas, 24 horas de curso</span></div>
+                        
+                                <p>
+Machine Learning é um framework de análise preditiva, muito utilizado hoje em dia em problemas de classificação. Sua fama recente se deve ao sucesso em aplicações de transcrição de áudio e classificação de imagens, mas uma grande parte de suas técnicas são muito úteis em qualquer problema de modelagem estatística.</p>
+                                <p> O objetivo deste curso é apresentar as etapas essenciais de um projeto de Machine Learning, desenvolvendo a análise crítica necessária para escolher, ajustar, avaliar e interpretar modelos preditivos, utilizando o R como ferramanta. Também será discutido aspectos teóricos para compreender como a matemática dos modelos funciona por trás.</p>
+                                <button class="btn-drop"data-toggle="collapse"  data-target="#curso-b"><h2>Conteúdo</h2><span>+</span>
+                                  </button>
+                                <div class="red-bar"></div>
+                                <div class="cont-cursos collapse multi-collapse" id="curso-b">
+                                    <div class="row"></div>
+                                    <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4">
+                                        <h2>O que é Machine Learning</h2>
+                                        <ul>
+                                          <li>História</li>
+                                          <li>O que é modelagem preditiva</li>
+                                          <li>Definições e Nomenclaturas</li>
+                                          <li>Por que e quando usar</li>
+                                          <li>Métricas e Funções de Custo</li>
+                                        </ul>
+                                    </div>
+                                    <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4">
+                                        <h2>Conceitos Centrais</h2>
+                                        <ul>
+                                          <li>Overfitting</li>
+                                          <li>Hiperparâmetros</li>
+                                          <li>Bases de Treino/Teste/Validação</li>
+                                          <li>Cross-Validation</li>
+                                          <li>Relação Viés-Variância</li>
+                                        </ul>
+                                    </div>
+                                    <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4">
+                                        <h2>Modelos de Regressão</h2>
+                                        <ul>
+                                        <li>Regressão Linar</li>
+                                        <li>RMSE, MAPE, R2.</li>
+                                        <li>Gradient Descent</li>
+                                        <li>Estimadores e estimativas</li>
+                                        <li>Regularização LASSO</li>
+                                        <li>Principais cuidados com os dados</li>
+                                        </ul>
+                                    </div>
+                                    <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4">
+                                        <h2>Modelos de Classificação</h2>
+                                        <ul>
+                                        <li>Regressão Logística</li>
+                                        <li>Binary Cross-entropy (Deviance)</li>
+                                        <li>Probabilidades vs Classes</li>
+                                        <li>Matriz de Confusão</li>
+                                        <li>Curva ROC</li>
+                                        <li>Acurácia, recall, precisão, F1, AUROC.</li>
+                                        </ul>
+                                    </div>
+                                    <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4">
+                                        <h2>Modelos de Árvores</h2>
+                                        <ul>
+                                        <li>Árvores de decisão</li>
+                                        <li>GINI e Entropia</li>
+                                        <li>Ganho de Informação</li>
+                                        <li>Random Forest</li>
+                                        <li>Gradient Boosting (XGBoost)</li>
+                                        </ul>
+                                    </div>
+                                    <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4">
+                                        <h2>Tidymodels</h2>
+                                        <ul>
+                                        <li>O que é</li>
+                                        <li>Como usar</li>
+                                        <li><code>{workflows}</code> e <code>{recipes}</code></li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                          <!--CURSO 3-->
+                        <div class="row curso-item">
+                            <div class="col-xs-12 col-sm-2 col-md-2 col-lg-2 curso-number">
+                                <h4>curso</h4>
+                                <h1>3</h1>
+                            </div>
+                            <div class="col-xs-12 col-sm-10 col-md-10 col-lg-10 curso-box">
+                                <a href = "https://www.curso-r.com/cursos/xgboost/" target = "_blank"><h1 class="title-r">XGBOOST</h1></a>
+                                 <div class="date-cont"><img src="images/calendario.svg" alt="data do curso" /><span> 12, 19 e 26 de junho, três sábados, das 9h00 às 12h00</span></div>
+                    <div class="time-cont"><img src="images/relogio.svg" alt="tempo de curso" /><span>  3 aulas, 9 horas de curso</span></div>
+                                <p>O XGBoost é um dos algoritmos mais utilizados atualmente para resolver problemas de modelagem preditiva, sendo um dos modelos mais vezes campeão de competições do Kaggle.</p>
+                                <p>O objetivo deste workshop é apresentar os principais conceitos por trás desse algoritmo e mostrar como ajustar, tunar e avalir a sua performance. Também vamos discutir sobre o framework do Machine Learning e apresentar algumas técnicas de interpretabilidade.</p>
+                                <button class="btn-drop"data-toggle="collapse"  data-target="#curso-d"><h2>Conteúdo</h2><span>+</span>
+                                  </button>
+                                <div class="red-bar"></div>
+                                <div class="cont-cursos collapse multi-collapse" id="curso-d">
+                                      
+                                    <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4">
+                                        <h2>Introdução</h2>
+                                        <ul>
+                                        <li>O que é e quando utilizar o XGBoost</li>
+                                        <li>Criando um XGBoost passo-a-passo</li>
+                                        </ul>
+                                    </div>
+                                    <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4">
+                                        <h2>Ajuste</h2>
+                                        <ul>
+                                        <li>Tuning do modelo</li>
+                                        <li><em>Overfitting</em> e validação cruzada</li>
+                                        <li>Métricas de performance</li>
+                                        <li>Introdução ao Tidymodels</li>
+                                        <li>Ajustanto um XGBoost no R com Tidymodels</li>
+                                        <li>Tradução de um XGBoost em SQL</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                          <!--CURSO 4-->
+                        <div class="row curso-item">
+                            <div class="col-xs-12 col-sm-2 col-md-2 col-lg-2 curso-number">
+                                <h4>curso</h4>
+                                <h1>4</h1>
+                            </div>
+                            <div class="col-xs-12 col-sm-10 col-md-10 col-lg-10 curso-box">
+                                <a href="https://www.curso-r.com/cursos/deep-learning/" target = "_blank"><h1 class="title-r">DEEP LEARNING</h1></a>
+                                 <div class="date-cont"><img src="images/calendario.svg" alt="data do curso" /><span> 12 a 29 de julho, às segundas e quintas, das 19h00 às 22h00</span></div>
+                    <div class="time-cont"><img src="images/relogio.svg" alt="tempo de curso" /><span>  6 aulas, 18 horas de curso</span></div>
+                                <p>Deep learning é uma classe de modelos que ficou famosa nos últimos anos dentro do Machine Learning por resolver problemas historicamnte difíceis de detecção de imagem, transcrição de áudio e classificação de textos.</p>
+                                
+                                <p>O objetivo deste curso é se familiarizar com as principais técnicas utilizadas em Deep Learning, discutindo como funcionam as redes neurais, quais são os softwares utilizados para treiná-las e quais são as principais técnicas para tunar esses modelos.</p>
+
+                                <button class="btn-drop"data-toggle="collapse"  data-target="#curso-c"><h2>Conteúdo</h2><span>+</span>
+                                  </button>
+                                <div class="red-bar"></div>
+                                <div class="cont-cursos collapse multi-collapse" id="curso-c">
+                                      
+                                    <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4">
+                                        <h2>Introdução</h2>
+                                        <ul>
+                                        <li>O que é e quando utilizar Deep Learning</li>
+                                        <li>O que são redes neurais profundas</li>
+                                        </ul>
+                                    </div>
+                                    <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4">
+                                        <h2>Ajuste</h2>
+                                        <ul>
+                                        <li>Ajustando modelos de deep learning no R</li>
+                                        <li>O pacote <code>keras</code></li>
+                                        <li>Técnicas de regularização</li>
+                                        </ul>
+                                    </div>
+                                    <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4">
+                                        <h2>Arquiteturas</h2>
+                                        <ul>
+                                        <li>Redes neurais recorrentes (RNN)</li>
+                                        <li>Redes neurais convolucionais (CNN)</li>
+                                        <li><em>Long short-term memory</em> (LSTM)</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!--FINAL CURSOS-->
+                    </div>
+                    
+                </div>
+            </div>
+            <!--INSTRUÇÕES-->
+            <div class="row pre-row" id="sobre-curso">
+                <div class="container">
+                    <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6">
+                        <div class="t-item">
+                        <img class="p-icon" src="images/como.svg"/><h1>Como será o curso?</h1>
+                             </div>
+                        <div class="red-box">
+                            <ul>
+                                <li>Aulas online, em tempo real, com um(a) professor(a) e um(a) monitor(a).</li>
+                                <li>Diversos exercícios “para casa” para praticar e tirar dúvidas.</li>
+                                <li>Projeto de análise de dados para aplicar o conteúdo aprendido.</li>
+                                <li>Gravação das aulas disponíveis por pelo menos 1 ano.</li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6">
+                          <div class="t-item-b">
+                        <img class="p-icon" src="images/pre.svg"/><h1>Pré-requisitos</h1>
+                        </div>
+                        <div class="red-box">
+                            <ul>
+                                <li>Interesse por Ciência de Dados</li>
+                                <li>Conhecimentos básicos de computação: criação de arquivos e pastas, instalação de programas, navegação na internet.</li>
+                                <li>O conteúdo do nosso curso <a href = "https://www.curso-r.com/cursos/r4ds-1/" target = "_blank" style = "color: white; font-weight: bold;">R para Ciência de Dados I</a>.</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row prof-row"id="professores">
+                <div class="container">
+                         <h1 class="text-center title-r"><span>Professores</span></h1>
+                <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6">
+                    <div class="row semi-prof-row">
+                        <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3">
+                            <img class="prof-img" src="images/athos.jpeg" />
+                        </div>
+                        <div class="col-xs-12 col-sm-12 col-md-9 col-lg-9 prof-item">
+                            <h1>ATHOS DAMIANI</h1>
+                            <p>Bacharel em Estatística pelo IME-USP e mestrando em IA pela Poli-USP. Trabalhou com modelos preditivos, web scraping e visualização/dashboards para ABJ, IBOPE, ClearSale, EDP e Itaú. Se interessa por tudo ligado ao R e à Estatística.</p>
+                            <div class="item-redes">
+                                <a href="https://github.com/athospd" target="_blank"><img src="images/git.svg" /></a>
+                                <a href="https://twitter.com/athos_damiani" target="_blank"><img src="images/twitter.svg" /></a>
+                                <a href="https://www.linkedin.com/in/athosdamiani/" target="_blank"><img src="images/linkedin.svg" /></a>
+                            </div>
+                        </div>
+                        
+                        
+                    </div>
+                </div>
+                    <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6">
+                    <div class="row semi-prof-row">
+                        <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3">
+                            <img class="prof-img" src="images/daniel.jpeg" />
+                        </div>
+                        <div class="col-xs-12 col-sm-12 col-md-9 col-lg-9 prof-item">
+                            <h1>DANIEL FALBEL</h1>
+                            <p>Bacharel em Estatística pelo IME. Software Engineer na RStudio. Trabalha diariamente com R há mais de 7 anos. É interessado por tudo que tem a ver com R, Machine Learning e Estatística</p>
+                            <div class="item-redes">
+                                <a href="https://github.com/dfalbel" target="_blank"><img src="images/git.svg" /></a>
+                                <a href="https://twitter.com/dfalbel" target="_blank"><img src="images/twitter.svg" /></a>
+                                <a href="https://www.linkedin.com/in/daniel-falbel-54b1a834/" target="_blank"><img src="images/linkedin.svg" /></a>
+                            </div>
+                        </div>
+                        
+                        
+                    </div>
+                </div>
+                </div>
+            </div>
+            <div class="faq"></div>
+            <div class="row faq-row" id="faq">
+                <h1 class="text-center title-r"><span>Perguntas Frequentes - FAQ</span></h1>
+                <div class="container">
+                    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                         <div class="black-faq">
+                            <button class="btn-faq-black" data-toggle="collapse"  data-target="#faq-a">
+                                <h1>Posso me inscrever em um único curso?</h1> <h1 class="plus-black">+</h1>
+                             </button>
+                            </div>
+                         <div class="red-border collapse multi-collapse" id="faq-a">
+                                <p>Sim! Basta acessar a página Curso-R.com.br/cursos e se inscrever. Mas ressaltamos que os preços promocionais dessa página só se aplicam aos pacotes completos.</p>
+                             </div>
+                    </div>
+                    
+                    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                         <div class="black-faq">
+                            <button class="btn-faq-black" data-toggle="collapse"  data-target="#faq-b">
+                                <h1>Terei direito ao certificado?</h1></h1> <h1 class="plus-black">+</h1>
+                             </button>
+                            </div>
+                         <div class="red-border collapse multi-collapse" id="faq-b">
+                                <p>  Sim, você receberá o certificado ao final do curso (sujeito à entrega de atividades solicitadas pelos professores), com a carga horária específica delimitada na página do curso. O certificado é individual e terá o mesmo nome que você utilizou na compra.</p>
+                             </div>
+                    </div>
+                    
+                    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                         <div class="black-faq">
+                            <button class="btn-faq-black" data-toggle="collapse"  data-target="#faq-c">
+                                <h1>As aulas são gravadas?</h1> <h1 class="plus-black">+</h1>
+                             </button>
+                            </div>
+                         <div class="red-border collapse multi-collapse" id="faq-c">
+                                <p>  Sim, as aulas são gravadas e disponibilizadas para os alunos inscritos por pelo menos 1 ano.</p>
+                             </div>
+                    </div>
+                       <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                         <div class="black-faq">
+                            <button class="btn-faq-black" data-toggle="collapse"  data-target="#faq-d">
+                                <h1>Como eu sei que minha inscrição foi confirmada?	</h1> <h1 class="plus-black">+</h1>
+                             </button>
+                            </div>
+                         <div class="red-border collapse multi-collapse" id="faq-d">
+                                <p>  Após a confirmação da compra, você receberá um e-mail de nossa equipe com a confirmação de sua inscrição, com as informações para entrar na turma pelo google classroom.
+</p>
+                             </div>
+                    </div>
+                       <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                         <div class="black-faq">
+                            <button class="btn-faq-black" data-toggle="collapse"  data-target="#faq-e">
+                                <h1>Fiz minha inscrição, mas não recebi o email de confirmação</h1> <h1 class="plus-black">+</h1>
+                             </button>
+                            </div>
+                         <div class="red-border collapse multi-collapse" id="faq-e">
+                                <p>  Caso você não receba email de confirmação antes do curso começar, primeiramente dê uma olhada na sua caixa de spam. Caso não esteja lá, basta nos enviar um e-mail para contato@Curso-R.com.</p>
+                             </div>
+                    </div>
+                       <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                         <div class="black-faq">
+                            <button class="btn-faq-black" data-toggle="collapse"  data-target="#faq-f">
+                                <h1>Quanto custam os cursos da Curso-R?	</h1> <h1 class="plus-black">+</h1>
+                             </button>
+                            </div>
+                         <div class="red-border collapse multi-collapse" id="faq-f">
+                                <p>  Depende do curso, todas as informações necessárias para ingressar em qualquer curso da Curso-R pode ser encontrada na sua respectiva página. As trilhas são pacotes promocionais de cursos com grandes descontos. O preço das trilhas pode ser encontrado também nas suas páginas.</p>
+                             </div>
+                    </div>
+                       <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                         <div class="black-faq">
+                            <button class="btn-faq-black" data-toggle="collapse"  data-target="#faq-g">
+                                <h1>Quais as formas de pagamento?</h1> <h1 class="plus-black">+</h1>
+                             </button>
+                            </div>
+                         <div class="red-border collapse multi-collapse" id="faq-g">
+                                <p>Nós trabalhamos com cartão de crédito, boleto e transferência bancária.</p>
+                             </div>
+                    </div>
+                       
+                </div>
+            </div>
+            </div><!--REG-ALL-->
+    </body>
+    <!-- JS -->
+    
+    <script src="js/jquery-3.4.1.min.js" type="text/javascript"></script>
+    <script src="js/bootstrap.min.js"  type="text/javascript"></script>
+    <script src="js/function.js"  type="text/javascript"></script>
+ 
+    
+    
+</html>
