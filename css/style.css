@@ -7,7 +7,7 @@
     overflow-x: hidden
 }
 .home-info-row{
-    background: #9A1334  url(../images/telescopio.png) no-repeat right center;
+    background: #9A1334  url(../images/universe.jpeg) no-repeat right center;
  
     padding: 40px 0;
     color: white;
@@ -470,7 +470,7 @@ a, a:visited, a:hover, a:active {
     .home-info-row{
         text-align: center;
         height: 1200px;
-          background: #9A1334  url(../images/telescopio.png) no-repeat  bottom;
+          background: #9A1334  url(../images/universe.jpeg) no-repeat  bottom;
     }
     .bg-gradient{
         background: rgba(154,19,52,1);
